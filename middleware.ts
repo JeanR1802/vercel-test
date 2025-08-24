@@ -6,7 +6,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const host = req.headers.get('host');
-  const rootDomain = 'gestularia.com'; // Asegúrate de que este es tu dominio
+  const rootDomain = 'mitiendita.gestularia.com'; // Asegúrate de que este es tu dominio
 
   if (host && host !== rootDomain && !host.startsWith('www.')) {
     const subdomain = host.replace(`.${rootDomain}`, '');
