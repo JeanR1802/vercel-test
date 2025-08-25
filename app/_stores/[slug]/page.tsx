@@ -34,7 +34,7 @@ export default async function StorePage({ params }: { params: { slug: string } }
   return (
     <div style={{ 
         fontFamily: 'sans-serif',
-        '--primary-color': store.primaryColor || '#000' // Usamos el color de la DB
+        '--primary-color': store.primaryColor || '#000'
       } as React.CSSProperties}
     >
       <header style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '40px 20px', textAlign: 'center' }}>
@@ -44,7 +44,8 @@ export default async function StorePage({ params }: { params: { slug: string } }
       </header>
 
       <main style={{ padding: '20px' }}>
-        <h2>Contenido de la tienda para el slug: "{params.slug}"</h2>
+        {/* 👇 LA LÍNEA CORREGIDA ESTÁ AQUÍ 👇 */}
+        <h2>Contenido de la tienda para el slug: &quot;{params.slug}&quot;</h2>
         <p>Aquí irían tus productos y demás información.</p>
       </main>
     </div>
