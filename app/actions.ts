@@ -1,38 +1,41 @@
 // app/actions.ts
-'use server'; // <-- ¡ESTA LÍNEA ES LA MÁS IMPORTANTE!
+'use server';
 
 import { createClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 
-// El resto de tu código...
 export async function createStoreAction(formData: FormData) {
   const slug = formData.get('slug') as string;
+  console.log('🚀 Acción createStoreAction iniciada. Slug recibido:', slug);
 
-  // 1. Validar el slug
   if (!slug || !/^[a-z0-9\-]+$/.test(slug)) {
-    throw new Error('Slug inválido.');
+    console.error('❌ ERROR: El slug es inválido o está vacío.');
+    // Simplemente lanzamos un error o retornamos, pero sin devolver un objeto
+    return;
   }
+  console.log('✅ Slug es válido.');
 
-  // 2. Conectar a Supabase
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // 3. Verificar si el slug ya existe
+  console.log('🔍 Verificando si el slug ya existe en Supabase...');
   const { data: existingStore } = await supabase
     .from('Store')
     .select('slug')
     .eq('slug', slug)
     .single();
 
+  console.log('📝 Resultado de la verificación (si es null, está libre):', existingStore);
+
   if (existingStore) {
-    console.error(`El slug "${slug}" ya está en uso.`);
-    // En el futuro, aquí retornarás un error para mostrarlo en la UI
-    return;
+    console.error('❌ ERROR: El slug ya está en uso. Deteniendo la acción.');
+    // CORRECCIÓN: No devolvemos un objeto, solo paramos la ejecución.
+    return; 
   }
 
-  // 4. Insertar la nueva tienda
+  console.log('➕ Intentando insertar nueva tienda en Supabase...');
   const { error } = await supabase.from('Store').insert({
     slug: slug,
     name: `Tienda de ${slug}`,
@@ -44,15 +47,17 @@ export async function createStoreAction(formData: FormData) {
   });
 
   if (error) {
-    console.error('Error al crear la tienda:', error);
-    // Aquí también deberías manejar el error en la UI
+    console.error('❌ ERROR de Supabase al insertar:', error);
+    // CORRECCIÓN: No devolvemos un objeto.
     return;
   }
 
-  // 5. Redirigir al nuevo subdominio
   const domain = process.env.NODE_ENV === 'production' 
-    ? 'tudominio.com' // Reemplaza con tu dominio real
+    ? 'tudominio.com'
     : 'localhost:3000';
   
-  redirect(`http://${slug}.${domain}`);
+  const newUrl = `http://${slug}.${domain}`;
+  console.log(`✅ Tienda creada con éxito. Redirigiendo a: ${newUrl}`);
+  
+  redirect(newUrl);
 }
